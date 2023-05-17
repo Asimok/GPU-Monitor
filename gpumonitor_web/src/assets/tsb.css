@@ -1,0 +1,37 @@
+.el-descriptions__body .el-descriptions__table .el-descriptions__cell {
+    box-sizing: border-box;
+    text-align: left;
+    font-weight: 400;
+    line-height: 24px;
+    font-size: 17px;
+
+}
+
+.el-descriptions__label:not(.is-bordered-label) {
+    color: #357C3C;
+    margin-right: 16px;
+    font-weight: 500;
+}
+
+.el-descriptions__content:not(.is-bordered-label) {
+    color:  #EF6D6D;
+    font-weight: 500;
+}
+
+.el-drawer__title {
+    margin: 0;
+    flex: 1;
+    line-height: inherit;
+    font-size: 19px;
+    color: #465c7c;
+}
+
+.el-dialog__title {
+    line-height: var(--el-dialog-font-line-height);
+    font-size: 22px;
+    font-weight: 600;
+    color: #573391
+
+    /*font-size: var(--el-dialog-title-font-size);*/
+    /* color: var(--el-text-color-primary); */
+}

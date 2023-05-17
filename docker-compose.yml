@@ -1,0 +1,16 @@
+version: "1.0"
+services:
+  server:
+    image: 219.216.65.59:5000/gpumonitor_server:latest
+    restart: always 
+    container_name: gpumonitor_server
+    ports:
+      - "7030:7030"
+  web:
+    image: 219.216.65.59:5000/gpumonitor_web:latest
+    restart: always 
+    container_name: gpumonitor_web
+    ports:
+      - "31800:80"
+    depends_on:
+      - server
