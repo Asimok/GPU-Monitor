@@ -4,16 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="df5308b0-89bd-4030-a755-97b58ad8f961" name="Changes" comment="更新readme">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/img/ip.png" beforeDir="false" afterPath="$PROJECT_DIR$/img/ip.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/img/log_1.png" beforeDir="false" afterPath="$PROJECT_DIR$/img/log_1.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/img/log_2.png" beforeDir="false" afterPath="$PROJECT_DIR$/img/log_2.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/img/log_3.png" beforeDir="false" afterPath="$PROJECT_DIR$/img/log_3.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/img/main.png" beforeDir="false" afterPath="$PROJECT_DIR$/img/main.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/img/update.png" beforeDir="false" afterPath="$PROJECT_DIR$/img/update.png" afterDir="false" />
-    </list>
+    <list default="true" id="df5308b0-89bd-4030-a755-97b58ad8f961" name="Changes" comment="更新readme" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -40,6 +31,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -53,6 +45,7 @@
       <updated>1684309328771</updated>
       <workItem from="1684309329871" duration="506000" />
       <workItem from="1684309887393" duration="1033000" />
+      <workItem from="1684311183972" duration="298000" />
     </task>
     <task id="LOCAL-00001" summary="更新readme">
       <created>1684309930380</created>
