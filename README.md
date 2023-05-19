@@ -102,14 +102,14 @@ docker stop gpumonitor_server & docker rm -f gpumonitor_server & docker rmi -f  
 ```
 
 ## 赞赏
-
+> 如果能够帮助到你
 <table style="width: 100%">
 <tr style="width: 100%">
-<td style="width: 50%;text-align: center;">
+<td style="width: 30%;text-align: center;">
 支付宝
 <img src="./img/zfb.jpg" alt="支付宝">
 </td>
-<td style="width: 50%;text-align: center">
+<td style="width: 30%;text-align: center">
 微信
 <img src="./img/wx.jpg" alt="微信">
 </td>
