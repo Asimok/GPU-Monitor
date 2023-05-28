@@ -117,8 +117,6 @@
                 </el-tab-pane>
 
                 <el-tab-pane label="系统监测" name="watcher">
-
-
                     <el-row justify="center">
                         <el-col :span="8">
                             <div class="statistic-card">
@@ -141,7 +139,7 @@
                                 <div class="statistic-footer">
                                     <div class="footer-item">
                                         <span>相比昨日</span>
-                                        <span v-if="user_data.compare_yesterday >=0" class="green">
+                                        <span v-if="user_data.compare_yesterday === 1" class="green">
               {{ user_data.compare_yesterday_value }}
               <el-icon>
                 <CaretTop/>
@@ -178,7 +176,7 @@
                                 <div class="statistic-footer">
                                     <div class="footer-item">
                                         <span>相比上月</span>
-                                        <span v-if="user_data.compare_last_month >=0" class="green">
+                                        <span v-if="user_data.compare_last_month ===1" class="green">
               {{ user_data.compare_last_month_value }}
               <el-icon>
                 <CaretTop/>
@@ -200,7 +198,7 @@
                                               title="New transactions today">
                                     <template #title>
                                         <div style="display: inline-flex; align-items: center">
-                                            历史访问用户
+                                            历史点击量
                                         </div>
                                     </template>
                                 </el-statistic>
@@ -364,13 +362,15 @@
                 title="服务器性能监管"
                 width="30%"
         >
-            <span>{{ sysInfoDialogMessage }}</span>
+            <span>{{
+                '您已经 ' + this.sysInfoTimeout / 1000 + ' 秒没进行任何操作了, 服务已自动挂起!'
+                }}</span>
             <template #footer>
       <span class="dialog-footer">
         <el-button type="success">
           保持挂起
         </el-button>
-        <el-button type="primary" @click="closeTimerDialog">
+        <el-button type="primary" @click="closeSuspendDialog">
             继续使用
         </el-button>
       </span>

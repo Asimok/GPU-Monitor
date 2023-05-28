@@ -1,7 +1,8 @@
 import axios from 'axios'
 
 const request = axios.create({
-    baseURL: 'http://127.0.0.1:7030',//更换为自己的服务ip
+    baseURL: 'http://219.216.64.197:7030', //197服务器
+    // baseURL: 'http://127.0.0.1:7030',
     timeout: 10000,
 })
 // request 拦截器

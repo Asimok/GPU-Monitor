@@ -26,10 +26,14 @@ export default {
             easterEggVisible: false,
             sysInfoTimer: null,
             sysInfoShowDialog: false,
-            sysInfoTimeout: 20 * 1000, //20s
-            sysInfoTimeoutLimit: 5 * 60 * 1000,// 5min
-            sysInfoDialogMessage: '您已经 20 秒没进行任何操作了, 服务已自动挂起!',
+            sysBaseTimeout: 20 * 1000, //默认重置挂起倒计时时间
+            sysInfoTimeout: 20 * 1000, // 当前挂起倒计时时间
+            sysInfoTimeoutLimit: 5 * 60 * 1000,// 挂起倒计时上限
+            sysCurrentTimeout: 20 * 1000, // 当前系统计时器时间
+            sysInfoDialogMessage: '',
             get_gpu_status_time_gap: 2000,
+            ip_timer: null,
+            ip_timer_interval: 2000, //2s
             get_server_data_timer: null,
             gup_data: [],
             open_pro_box: false,
@@ -70,8 +74,24 @@ export default {
             },
             //本月活跃ip散点图
             his_ip_data: {},
+            myChart: null,
             //系统更新日志
             update_log_data: [
+                {
+                    "timestamp": "2023-05-26",
+                    "title": "v4.4",
+                    "info": ["优化IP数据统计散点图显示效果", "优化计时器性能", "修复其他已知bug"]
+                },
+                {
+                    "timestamp": "2023-05-18",
+                    "title": "v4.3",
+                    "info": ["优化统计数据处理逻辑,降低接口调用频率", "修复一直初始化echart的问题", "调整echart的tooltip对应文本框的显示逻辑及位置"]
+                },
+                {
+                    "timestamp": "2023-05-18",
+                    "title": "v4.2",
+                    "info": ["修改当日/当月ip未去重问题", "修改累计访问ip数为网站累计点击量"]
+                },
                 {
                     "timestamp": "2023-05-17",
                     "title": "v4.1",
@@ -125,53 +145,69 @@ export default {
     mounted() {
         //初始化Echarts
         this.initEcharts()
-
-        this.get_gpu_status()
+        this.get_server_gpu_data()
         this.get_ip_data()
         this.get_statistics()
         // 监听后端数据
         this.get_server_data_timer = setInterval(() => {
-            this.get_server_data()
+            this.get_server_gpu_data()
         }, this.get_gpu_status_time_gap);
         //监听彩蛋
         this.egg_timer = setInterval(() => {
             this.clickCount = 0
         }, 1000);
         // 开始计时
-        this.sysInfoTimer = setTimeout(this.showDialogBox, this.sysInfoTimeout)
-
-        // 添加事件监听
-        document.addEventListener('click', this.resetTimer)
-        document.addEventListener('mousemove', this.resetTimer)
-        document.addEventListener('keydown', this.resetTimer)
-
-
+        this.sysInfoTimer = setInterval(() => {
+            this.sysCurrentTimeout -= 1000
+            // console.log(this.sysCurrentTimeout)
+            if (this.sysCurrentTimeout <= 0) {
+                this.showSuspendDialog()
+            }
+        }, 1000) // 开始新的计时
+        document.addEventListener('click', this.resetSysCurrentTimeout)
+        document.addEventListener('mousemove', this.resetSysCurrentTimeout)
+        document.addEventListener('keydown', this.resetSysCurrentTimeout)
     },
     beforeDestroy() {
         // 页面销毁时, 移除事件监听
-        document.removeEventListener('click', this.resetTimer)
-        document.removeEventListener('mousemove', this.resetTimer)
-        document.removeEventListener('keydown', this.resetTimer)
-        //清除彩蛋计时器
-        clearInterval(this.egg_timer)
+        document.removeEventListener('click', this.resetSysCurrentTimeout)
+        document.removeEventListener('mousemove', this.resetSysCurrentTimeout)
+        document.removeEventListener('keydown', this.resetSysCurrentTimeout)
+        //清除计时器
+        this.resetTimer()
     },
     methods: {
         resetTimer() {
-            clearTimeout(this.sysInfoTimer) // 清除计时器
+            clearInterval(this.sysInfoTimer) // 清除计时器
+            clearInterval(this.egg_timer)
+            clearInterval(this.ip_timer)
+            clearInterval(this.get_server_data_timer)
+        },
+        resetSysCurrentTimeout() {
+            this.sysCurrentTimeout = this.sysInfoTimeout // 重置计时
+        },
+        //挂起
+        showSuspendDialog() {
+            this.sysInfoShowDialog = true // 显示对话框
+            // console.log('挂起')
+            clearInterval(this.get_server_data_timer)
+            clearInterval(this.ip_timer)
+        },
+        closeSuspendDialog() {
+            this.sysInfoShowDialog = false // 关闭对话框
+
             this.sysInfoTimeout += 60 * 1000 //每次延时1min
             this.sysInfoTimeout = Math.min(this.sysInfoTimeout, this.sysInfoTimeoutLimit)
-            this.sysInfoTimer = setTimeout(this.showDialogBox, this.sysInfoTimeout) // 开始新的计时
-        },
-        showDialogBox() {
-            this.sysInfoShowDialog = true // 显示对话框
-            clearInterval(this.get_server_data_timer)
+            this.sysCurrentTimeout = this.sysInfoTimeout
 
-        },
-        closeTimerDialog() {
-            this.sysInfoShowDialog = false // 关闭对话框
             this.get_server_data_timer = setInterval(() => {
-                this.get_server_data()
+                this.get_server_gpu_data()
             }, this.get_gpu_status_time_gap);
+            if (this.activeName === 'watcher') {
+                this.ip_timer = setInterval(() => {
+                    this.get_server_statistics()
+                }, this.ip_timer_interval)
+            }
         },
 
         runMC() {
@@ -206,7 +242,7 @@ export default {
         },
         handleClick() {
             this.clickCount++;
-            console.log(this.clickCount)
+            // console.log(this.clickCount)
             if (this.clickCount === 6) {
                 this.easterEggVisible = true;
                 this.clickCount = 0;  // 重置计数器
@@ -433,19 +469,26 @@ export default {
             if (tab === "watcher") {
                 this.$nextTick(() => {
                     echarts.getInstanceByDom(this.$refs.hisEchart).resize()
-                    this.his_ip_scatter()
+                    this.get_server_statistics()
+                    // ip统计定时器
+                    this.ip_timer = setInterval(() => {
+                        this.get_server_statistics()
+                    }, this.ip_timer_interval)
                 }).then()
-            }
+            } else
+                clearInterval(this.ip_timer)
         },
         initEcharts() {
-            let hisEchart = echarts.init(this.$refs.hisEchart)
+            this.myChart = echarts.init(this.$refs.hisEchart)
             // 配置
             let valveOption = {}
-            hisEchart.setOption(valveOption)
+            this.myChart.setOption(valveOption)
+            // this.myChart = echarts.init(document.getElementById("his_ip_scatter"));
         },
         //历史用户ip分布
         his_ip_scatter() {
-            let myChart = echarts.init(document.getElementById("his_ip_scatter"));
+            // 销毁 chart 实例
+            // this.myChart.clear();
             //[时间,次数,大小,ip]
             const days = this.his_ip_data.datetime
             const data = this.his_ip_data.details
@@ -461,10 +504,10 @@ export default {
                         fontSize: 20
                     }
                 },
-                legend: {
-                    data: ['IP'],
-                    left: 'right'
-                },
+                // legend: {
+                //     data: ['IP'],
+                //     left: 'right'
+                // },
                 xAxis: {
                     type: 'category',
                     data: days,
@@ -478,6 +521,11 @@ export default {
                     axisLabel: {
                         interval: 0,
                         rotate: 0,
+                        // 增加间距
+                        // formatter: function (value) {
+                        //     let val = value.split("");
+                        //     return val.join("\n");
+                        // }
                     },
                 },
                 yAxis: {
@@ -488,15 +536,14 @@ export default {
                     }
                 },
                 tooltip: {
-                    position: 'bottom',
+                    // position: 'bottom',
                     //[时间,次数,大小,ip]
                     formatter: function (params) {
-                        return (
-                            "ip: " + params.value[3] + " 在 " +
-                            days[params.value[0]] +
-                            ' 访问 ' +
-                            params.value[1] + " 次"
-                        );
+                        // params.value[3] += params.value[3]
+                        return '   ' + days[params.value[0]] +
+                            ' 访问 ' + params.value[1] + " 次<br/>" +
+                            "ip:&nbsp;" +
+                            (params.value[3].slice(1).replaceAll(' ', '<br/>&nbsp;&nbsp;&nbsp;&nbsp;'));
                     }
                 },
                 series: [
@@ -504,13 +551,13 @@ export default {
                         name: 'IP',
                         type: 'scatter',
                         symbolSize: function (val) {
-                            if (val[2] < 10) {
-                                return 1 + val[2] * 3;
+                            if (val[2] < 5) {
+                                return 5 + val[2] * 3;
+                            } else if (val[2] < 15) {
+                                return val[2];
                             } else if (val[2] < 30) {
-                                return 30 + val[2];
-                            } else if (val[2] < 50) {
-                                return 50 + val[2];
-                            } else return 50;
+                                return val[2];
+                            } else return val[2];
                         },
                         // 定义颜色
                         itemStyle: {
@@ -518,11 +565,11 @@ export default {
                                 const val = params.data
                                 // console.log("val:", val.data)
                                 const colorlist = ['#006E7F', '#F8CB2E', '#EE5007', '#B22727'];
-                                if (val[2] < 10) {
+                                if (val[2] < 5) {
                                     return colorlist[0];
-                                } else if (val[2] < 30) {
+                                } else if (val[2] < 15) {
                                     return colorlist[1];
-                                } else if (val[2] < 50) {
+                                } else if (val[2] < 30) {
                                     return colorlist[2];
                                 } else return colorlist[3];
                             }
@@ -535,12 +582,13 @@ export default {
                 ],
                 grid: {
                     left: 2,
-                    bottom: 10,
-                    right: 10,
+                    // bottom: 10,
+                    right: 20,
                     containLabel: true
                 },
+
             };
-            myChart.setOption(option);
+            this.myChart.setOption(option);
         },
         get_ip_data() {
             this.$http
@@ -548,7 +596,6 @@ export default {
                 .then((res) => {
                     if (res.status === 200) {
                         this.his_ip_data = res.data
-                        this.his_ip_scatter()
                     }
                 })
                 .catch(() => {
@@ -571,11 +618,17 @@ export default {
                 });
 
         },
-        get_server_data() {
+        //获取GPU数据
+        get_server_gpu_data() {
             this.get_gpu_status()
-            this.get_ip_data()
+        },
+        //获取统计数据
+        get_server_statistics() {
             this.get_statistics()
+            this.get_ip_data()
+            this.his_ip_scatter()
         }
+
     },
 
 
