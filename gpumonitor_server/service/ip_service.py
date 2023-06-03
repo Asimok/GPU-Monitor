@@ -1,6 +1,7 @@
 import collections
 import datetime
 
+from config.setting import COON
 from dao.ip_dao import IpInfoDao
 
 
@@ -23,23 +24,31 @@ class IpService:
                 details: [[次数,时间,大小,ip],] 
                 }
         """
-        date_dict = collections.defaultdict(list)
+        # [ip ,日期, 次数]
+        #  日期 次数 相同的 数据 合并ip
+        temp_ip_data_one_month = collections.defaultdict(str)
         for ip_data in ip_data_one_month:
-            #   [时间,次数,大小,ip]
-            date_dict[ip_data[1][5:]].append([str(ip_data[1])[5:], ip_data[2], ip_data[2], ip_data[0]])
+            temp_ip_data_one_month[str(ip_data[1]) + "#" + str(ip_data[2])] += (" " + ip_data[0])
+        # 排序
+        temp_datetime_with_ip = list(temp_ip_data_one_month.keys())
+
         # 构造数据结构
-        temp_datetime = list(date_dict.keys())
+        temp_datetime = set()
+        for date in temp_datetime_with_ip:
+            k = date.split("#")
+            temp_datetime.add(k[0][5:])
+        temp_datetime = list(temp_datetime)
         temp_datetime.sort()
+
         temp_details = list()
-        for date in temp_datetime:
-            for cur_details in date_dict[date]:
-                cur_details[0] = temp_datetime.index(cur_details[0])
-                temp_details.append(cur_details)
+        for date in temp_datetime_with_ip:
+            k = date.split("#")
+            v = temp_ip_data_one_month[date]
+            temp_details.append([temp_datetime.index(k[0][5:]), k[1], k[1], v])
         return {"datetime": temp_datetime, "details": temp_details}
 
     #     数据统计
     # 今日活跃用户
-
     def get_ip_nums_today(self):
         # 获取当天范围内的ip数量
         cur_time = datetime.datetime.now()
@@ -52,7 +61,7 @@ class IpService:
         else:
             percent = (today_num - yesterday_num) / yesterday_num
 
-        if percent > 0:
+        if percent >= 0:
             compare_yesterday = 1
         else:
             compare_yesterday = 0
@@ -71,22 +80,20 @@ class IpService:
             percent = 0
         else:
             percent = (month_num - two_month_num) / two_month_num
-        if percent > 0:
+        if percent >= 0:
             compare_yesterday = 1
         else:
             compare_yesterday = 0
         return {"month_online_user_nums": month_num, "compare_last_month": compare_yesterday,
                 "compare_last_month_value": str(round(percent * 100, 2)) + "%"}
 
-    # 历史访问用户
+    # 历史点击量
     def get_ip_nums_history(self):
         history_online_user_nums = self.ip_info_dao.get_ip_nums_all()
         return {"history_online_user_nums": history_online_user_nums}
 
 
 if __name__ == '__main__':
-    from gpumonitor_server.config.setting import COON
-
     ip_service = IpService(COON)
     # data = ip_service.get_ip_nums_today()
     data = ip_service.get_ip_nums_this_month()

@@ -75,8 +75,16 @@ export default {
             //本月活跃ip散点图
             his_ip_data: {},
             myChart: null,
+            //公告模块
+            announcement_data: [],
+            announcement_visible: false,
             //系统更新日志
             update_log_data: [
+                {
+                    "timestamp": "2023-06-01",
+                    "title": "v4.5",
+                    "info": ["新增公告模块", "新增GPU离线状态", "优化IP数据统计散点图显示效果", "修复其他已知bug"]
+                },
                 {
                     "timestamp": "2023-05-26",
                     "title": "v4.4",
@@ -133,6 +141,7 @@ export default {
                     "info": ["重构老版本GPUMonitor前端", "重构老版本GPUMonitor后端", "新增197和204两台服务器"]
                 }
             ],
+
         }
     },
 
@@ -145,6 +154,7 @@ export default {
     mounted() {
         //初始化Echarts
         this.initEcharts()
+        this.get_notice()
         this.get_server_gpu_data()
         this.get_ip_data()
         this.get_statistics()
@@ -554,10 +564,10 @@ export default {
                             if (val[2] < 5) {
                                 return 5 + val[2] * 3;
                             } else if (val[2] < 15) {
-                                return val[2];
+                                return parseInt(val[2]) + 5;
                             } else if (val[2] < 30) {
                                 return val[2];
-                            } else return val[2];
+                            } else return Math.max(45, val[2]);
                         },
                         // 定义颜色
                         itemStyle: {
@@ -627,6 +637,51 @@ export default {
             this.get_statistics()
             this.get_ip_data()
             this.his_ip_scatter()
+        },
+        handleCloseSysInfo() {
+
+        },
+        //公告模块
+        get_notice() {
+            this.$http
+                .get("/get_announcement")
+                .then((res) => {
+                    if (res.status === 200) {
+                        console.log("announcement_data:", res.data)
+                        this.announcement_data = res.data
+                        this.show_notice()
+                    }
+                })
+                .catch(() => {
+                    console.log("公告加载失败")
+                });
+        },
+        // 确认公告
+        confirm_notice(announcement_id) {
+            this.$http.post("/add_push_info", {"announcement_id": announcement_id}).then((res) => {
+                if (res.status === 200) {
+                    // 从公告列表中删除
+                    this.announcement_data = this.announcement_data.filter(item => item[0] !== announcement_id)
+                    if (this.announcement_data.length === 0) {
+                        this.announcement_visible = false
+                    }
+                }
+            }).catch(() => {
+                console.log("确认失败")
+            })
+        },
+        //显示公告
+        show_notice() {
+            if (this.announcement_data.length > 0) {
+                this.announcement_visible = true
+            }
+        },
+        handleCloseAnnouncement() {
+            if (this.announcement_data.length === 0) {
+                this.announcement_visible = false
+            } else {
+                ElMessage.warning("请确认公告")
+            }
         }
 
     },

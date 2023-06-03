@@ -78,3 +78,26 @@
 .el-col {
   text-align: center;
 }
+
+:deep(.el-descriptions__title) {
+  color: #354259;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+:deep( .el-descriptions__header) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.github-icon {
+  margin-right: 8px;
+  background: url("../../assets/github.png") no-repeat;
+
+  .github-icon:before {
+    content: "替";
+    font-size: 16px;
+    visibility: hidden;
+  }
+}

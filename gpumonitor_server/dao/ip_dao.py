@@ -1,4 +1,5 @@
 import datetime
+import random
 
 from cffi.cparser import lock
 
@@ -65,22 +66,36 @@ class IpInfoDao:
     def get_ip_nums(self, _cur_time, gap=1):
         # 获取gap范围内的ip数量
         days_ago = _cur_time - datetime.timedelta(days=gap)
-        _data = 0
+        # _data = 0
+        ip_set = set()
         try:
             lock.acquire(True)
-            self.c.execute("SELECT COUNT(ip) FROM ip_info WHERE date BETWEEN ? AND ?", (days_ago, _cur_time))
-            _data = self.c.fetchone()
+            # 需要对相同ip去重
+            self.c.execute("SELECT ip FROM ip_info WHERE date BETWEEN ? AND ?", (days_ago, _cur_time))
+            ip_data = self.c.fetchall()
+            for ip in ip_data:
+                ip_set.add(ip[0])
+            # self.c.execute("SELECT COUNT(ip) FROM ip_info WHERE date BETWEEN ? AND ?", (days_ago, _cur_time))
+            # _data = self.c.fetchone()
         finally:
             lock.release()
-        return _data[0]
+        return len(ip_set)
 
-    # 历史访问用户
+    # 历史点击量
     def get_ip_nums_all(self):
-        _data = 0
+        _data = []
         try:
             lock.acquire(True)
-            self.c.execute("SELECT COUNT(ip) FROM ip_info")
-            _data = self.c.fetchone()
+            # self.c.execute("SELECT COUNT(ip) FROM ip_info")
+            # _data = self.c.fetchone()
+            # 查询总数据量
+            self.c.execute("SELECT times FROM ip_info")
+            ip_times = self.c.fetchall()
+            # 累加 ip_times
+            temp = []
+            for times in ip_times:
+                temp.append(times[0])
+            _data.append(sum(temp))
         finally:
             lock.release()
         return _data[0]
@@ -90,12 +105,12 @@ if __name__ == '__main__':
     coon = COON
     ip_info_dao = IpInfoDao(coon)
     cur_time = datetime.datetime.now()
-    # # 生成2023-4-10 到 2023-5-17 的数据
+    # 生成2023-4-10 到 2023-5-17 的数据
     # for i in range(20):
     #     one_month_ago = cur_time - datetime.timedelta(days=i)
     #     for i in range(random.randint(1, 9)):
     #         ip_info_dao.add_ip("192.168.3." + str(i), one_month_ago.strftime("%Y-%m-%d"))
     # data = ip_info_dao.get_ip_data_one_month(cur_time, 30)
     # data = ip_info_dao.get_ip_nums(cur_time, 2)
-    ip_info_dao.add_ip("127.0.0.1", cur_time.strftime("%Y-%m-%d"))
+    # ip_info_dao.add_ip("127.0.0.1", cur_time.strftime("%Y-%m-%d"))
     # print(data)

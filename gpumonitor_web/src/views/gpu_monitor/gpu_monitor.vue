@@ -8,6 +8,8 @@
                             <span>{{ cur_gpu_data.server_name }}</span>
                             <div style="float: right;">
                                 <span style="font-weight: 500;font-size: 14px">GPU状态: </span>
+                                <span v-if="cur_gpu_data.gpu_list.length===0"
+                                      style="font-weight: 500;font-size: 16px;color: #d20404;margin-left: 5px">离线</span>
                                 <template v-for="(cur_gpu_info,m) in cur_gpu_data.gpu_list" :key="m">
                                     <el-tag v-if="cur_gpu_info.use_memory<100" style="margin-left: 10px" size="large"
                                             type="success"
@@ -53,6 +55,8 @@
                                 <!--            <el-button class="button" text>Operation button</el-button>-->
                                 <div style="float: right;">
                                     <span style="font-weight: 500;font-size: 14px">GPU状态: </span>
+                                    <span v-if="cur_gpu_data.gpu_list.length===0"
+                                          style="font-weight: 500;font-size: 16px;color: #d20404;margin-left: 5px">离线</span>
                                     <template v-for="(cur_gpu_info,m) in cur_gpu_data.gpu_list" :key="m">
                                         <el-tag v-if="cur_gpu_info.use_memory<100" style="margin-left: 10px"
                                                 size="large" type="success"
@@ -334,10 +338,15 @@
 
         </el-main>
         <el-footer style="text-align: center">
-            <span @click="handleClick">{{ update_log_data[0].title }} powered by maqi {{
+            <span @click="handleClick">{{ update_log_data[0].title }} Developed By maqi {{
                 update_log_data[0].timestamp
                 }}  </span>
             <span @click="handleClick_closeMC"> © 2022-2023</span>
+            <br/>
+            <el-link type="primary" href="https://github.com/Asimok/GPU-Monitor" target="_blank">
+                <el-image style="width: 18px; height: 18px;margin-right: 4px" :src="require('../../assets/github.png')"/>
+                GPU-Monitor
+            </el-link>
         </el-footer>
 
         <el-dialog
@@ -361,6 +370,7 @@
                 v-model="sysInfoShowDialog"
                 title="服务器性能监管"
                 width="30%"
+                :before-close="handleCloseSysInfo"
         >
             <span>{{
                 '您已经 ' + this.sysInfoTimeout / 1000 + ' 秒没进行任何操作了, 服务已自动挂起!'
@@ -376,6 +386,35 @@
       </span>
             </template>
         </el-dialog>
+
+        <el-dialog
+                v-model="announcement_visible"
+                title="系统公告"
+                width="30%"
+                :before-close="handleCloseAnnouncement"
+        >
+            <template v-for="(item,i) in announcement_data" :key="i">
+                <el-descriptions
+                        style="margin-bottom: -10px"
+                        :title=item[5]
+                        :column="1">
+                    <template #extra>
+                        <el-button style="margin-left: 15px" type="primary" @click="confirm_notice( item[0])">了解了
+                        </el-button>
+                    </template>
+                    <el-descriptions-item>
+                        <span style="font-size: 12px;margin-left: -16px; color: #465c7c">公告时限 : {{
+                            item[1].split('.')[0]
+                            }} 至 {{ item[2].split('.')[0] }}</span>
+                        <span style="font-size: 12px;margin-left: 10px; color: #465c7c">提醒次数 : {{
+                            item[3]
+                            }}/ip</span>
+                    </el-descriptions-item>
+                </el-descriptions>
+                <el-divider v-if="i!==announcement_data.length-1" style="margin-top: 15px"></el-divider>
+            </template>
+        </el-dialog>
+
     </el-container>
 </template>
 

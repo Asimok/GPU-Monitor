@@ -7,12 +7,14 @@ from flask_cors import CORS
 
 from config.setting import COON, SERVERS_CONFIG
 from core.Server import Server
+from service.announcement_service import AnnouncementService
 
 from service.ip_service import IpService
 
 app = Flask(__name__)
 CORS(app, resources=r'/*')
 ip_service = IpService(COON)
+announcement_service = AnnouncementService(COON)
 servers = [Server(*server) for server in SERVERS_CONFIG]
 
 
@@ -41,6 +43,7 @@ def add_log():
     for server in servers:
         if server.server_name == server_name:
             server.LOGGER.add_log(pid, log)
+            # print(server.LOGGER.log_dict)
     return jsonify(
         {"code": 200,
          "message": "绑定  server : " + str(server_name) + " pid : " + str(pid) + " cmd : " + str(log) + " 成功!"})
@@ -79,7 +82,8 @@ def delete_log():
 
 @app.route('/runMC', methods=['GET'])
 def runMC():
-    host = '127.0.0.1'
+    # run_mc_server('219.216.64.204', 'mc', 'mc')
+    host = '219.216.64.204'
     user = 'mc'
     passwd = 'mc'
     ssh = paramiko.SSHClient()
@@ -94,7 +98,7 @@ def runMC():
 # 彩蛋
 @app.route('/stopMC', methods=['GET'])
 def stopMC():
-    host = '127.0.0.1'
+    host = '219.216.64.204'
     user = 'mc'
     passwd = 'mc'
     ssh = paramiko.SSHClient()
@@ -118,6 +122,41 @@ def get_statistics():
     ip_nums_month = ip_service.get_ip_nums_this_month()
     ip_nums_all = ip_service.get_ip_nums_history()
     return {**ip_nums_today, **ip_nums_month, **ip_nums_all}
+
+
+# 公告模块
+@app.route('/add_announcement', methods=['POST'])
+def add_announcement():
+    try:
+        announcement_service.add_announcement(announcement=request.form["announcement"],
+                                              expire_date=int(request.form["expire_date"]),
+                                              available=int(request.form["available"]),
+                                              times=int(request.form["times"]))
+        return jsonify({'code': 200, 'message': '添加成功!'})
+    except Exception as e:
+        return jsonify({'code': 200, 'message': "添加失败!"})
+
+
+# 删除公告
+@app.route('/delete_announcement', methods=['POST'])
+def delete_announcement():
+    try:
+        announcement_service.del_announcement_by_id(request.form["announcement_id"])
+        return jsonify({'code': 200, 'message': '删除成功!'})
+    except Exception as e:
+        return jsonify({'code': 200, 'message': "删除失败!"})
+
+
+@app.route('/get_announcement', methods=['GET'])
+def get_announcement():
+    return announcement_service.get_announcement_by_ip(request.remote_addr)
+
+
+@app.route('/add_push_info', methods=['POST'])
+def add_push_info():
+    print(request.json)
+    announcement_service.add_push_info(ip=request.remote_addr, announcement_id=request.json['announcement_id'])
+    return jsonify({'code': 200, 'message': '添加成功!'})
 
 
 if __name__ == '__main__':

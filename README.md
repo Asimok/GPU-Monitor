@@ -28,6 +28,26 @@
 </tr>
 </table>
 
+### 公告模块
+
+<table style="width: 100%">
+<tr style="width: 100%;">
+<td colspan="2" style="width: 100%;">
+<img src="./img/img_5.png" alt="首页">
+</td>
+</tr>
+</table>
+
+### GPU服务器详情
+<table style="width: 100%">
+<tr style="width: 100%;">
+<td colspan="2" style="width: 100%;">
+<img src="./img/img_2.png" alt="首页">
+</td>
+</tr>
+</table>
+
+
 ### 日志系统
 
 <table style="width: 100%">
@@ -38,12 +58,21 @@
 </tr>
 </table>
 
-### 日志管理
+### 日志系统
 
 <table style="width: 100%">
 <tr style="width: 100%;">
 <td colspan="2" style="width: 100%;">
-<img src="./img/log_2.png" alt="日志管理-弹窗">
+<img src="./img/img_3.png" alt="日志管理-弹窗">
+</td>
+</tr>
+</table>
+
+### 日志管理
+<table style="width: 100%">
+<tr style="width: 100%;">
+<td colspan="2" style="width: 100%;">
+<img src="./img/img_4.png" alt="日志管理-弹窗">
 </td>
 </tr>
 </table>
@@ -63,10 +92,21 @@
 <table style="width: 100%">
 <tr style="width: 100%;">
 <td colspan="2" style="width: 100%;">
-<img src="./img/ip.png" alt="系统监测">
+<img src="./img/img.png" alt="系统监测">
 </td>
 </tr>
 </table>
+
+### 性能监管
+
+<table style="width: 100%">
+<tr style="width: 100%;">
+<td colspan="2" style="width: 100%;">
+<img src="./img/img_1.png" alt="系统监测">
+</td>
+</tr>
+</table>
+
 
 ### 更新日志
 
