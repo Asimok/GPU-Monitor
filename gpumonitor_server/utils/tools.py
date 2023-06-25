@@ -89,3 +89,11 @@ def get_log(host, user, passwd, command):
 
 
 if __name__ == "__main__":
+    # a = detect_gpu_status('219.216.64.175', 'maqi', '.')
+    # b = get_pro_time('202.199.6.23', 'maqi', '.', 13677)
+    # a = detect_gpu_status('219.216.64.175', 'gpu_monitor', 'neu.')
+    c = get_log('219.216.64.204', 'gpu_monitor', 'neu.', "tail -100 /data0/maqi/BELLE/train/log.log")
+
+    # e = run_mc_server('219.216.64.204', 'mc', 'mc')
+    # f = stop_mc_server('219.216.64.204', 'mc', 'mc')
+    print()

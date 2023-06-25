@@ -8,12 +8,13 @@ import {
     CaretTop, ChatLineRound, Male,
     Warning,
 } from '@element-plus/icons'
+import {Apple} from "@element-plus/icons-vue";
 
 
 export default {
     name: 'Gpu_monitor',
 
-    components: {ChatLineRound, Male, CaretBottom, Warning, ArrowRight, CaretTop},
+    components: {Apple, ChatLineRound, Male, CaretBottom, Warning, ArrowRight, CaretTop},
 
     mixins: [],
 
@@ -78,8 +79,33 @@ export default {
             //公告模块
             announcement_data: [],
             announcement_visible: false,
+            //历史公告
+            all_history: [],
+            addAnnouncementShowDialog: false,
+            delAnnouncementShowDialog: false,
+            addAnnouncementForm: {
+                announcement: '',
+                expire_date: '',
+                available: '',
+                times: '',
+                access_token: '',
+            },
+            delAnnouncementForm: {
+                announcement_id: '',
+                access_token: '',
+            },
             //系统更新日志
             update_log_data: [
+                {
+                    "timestamp": "2023-06-25",
+                    "title": "v4.6.1",
+                    "info": ["新增发布公告", "新增删除公告"]
+                },
+                {
+                    "timestamp": "2023-06-07",
+                    "title": "v4.6",
+                    "info": ["新增历史公告版块", "优化IP数据统计散点图显示效果"]
+                },
                 {
                     "timestamp": "2023-06-01",
                     "title": "v4.5",
@@ -485,6 +511,8 @@ export default {
                         this.get_server_statistics()
                     }, this.ip_timer_interval)
                 }).then()
+            } else if (tab === 'his_notice') {
+                this.get_history_announcement()
             } else
                 clearInterval(this.ip_timer)
         },
@@ -503,7 +531,7 @@ export default {
             const days = this.his_ip_data.datetime
             const data = this.his_ip_data.details
                 .map(function (item) {
-                    return [item[0], item[1], item[2], item[3]];
+                    return [item[0], Math.min(45, item[1]), item[2], item[3], item[1]];
                 });
             let option = {
                 title: {
@@ -541,6 +569,9 @@ export default {
                 yAxis: {
                     type: 'value',
                     // data: days,
+                    min: 0,
+                    max: 45,
+                    interval: 5,
                     axisLine: {
                         show: false
                     }
@@ -549,9 +580,16 @@ export default {
                     // position: 'bottom',
                     //[时间,次数,大小,ip]
                     formatter: function (params) {
+                        if (params.value[1] < 45) {
+                            // params.value[3] += params.value[3]
+                            return '   ' + days[params.value[0]] +
+                                ' 访问 ' + params.value[1] + " 次<br/>" +
+                                "ip:&nbsp;" +
+                                (params.value[3].slice(1).replaceAll(' ', '<br/>&nbsp;&nbsp;&nbsp;&nbsp;'));
+                        }
                         // params.value[3] += params.value[3]
                         return '   ' + days[params.value[0]] +
-                            ' 访问 ' + params.value[1] + " 次<br/>" +
+                            ' 访问 ' + params.value[4] + " 次<br/>" +
                             "ip:&nbsp;" +
                             (params.value[3].slice(1).replaceAll(' ', '<br/>&nbsp;&nbsp;&nbsp;&nbsp;'));
                     }
@@ -561,27 +599,34 @@ export default {
                         name: 'IP',
                         type: 'scatter',
                         symbolSize: function (val) {
-                            if (val[2] < 5) {
-                                return 5 + val[2] * 3;
-                            } else if (val[2] < 15) {
-                                return parseInt(val[2]) + 5;
-                            } else if (val[2] < 30) {
-                                return val[2];
-                            } else return Math.max(45, val[2]);
+                            if (val[2] < 45) {
+                                return parseInt(val[2]) * 1.5 + 5;
+                            } else return parseInt(val[4]) * 1.5 + 10;
                         },
                         // 定义颜色
                         itemStyle: {
                             color: function (params) {
                                 const val = params.data
                                 // console.log("val:", val.data)
-                                const colorlist = ['#006E7F', '#F8CB2E', '#EE5007', '#B22727'];
-                                if (val[2] < 5) {
+                                const colorlist = ['#438EAB', '#6B7478', '#E2ACA7', '#DE8395', '#DED762', '#DE7657', '#57DEBA', '#A283DE', '#62DE76', '#AB4358'];
+                                if (val[2] < 2) {
                                     return colorlist[0];
-                                } else if (val[2] < 15) {
+                                } else if (val[2] < 3) {
                                     return colorlist[1];
-                                } else if (val[2] < 30) {
+                                } else if (val[2] < 4) {
                                     return colorlist[2];
-                                } else return colorlist[3];
+                                } else if (val[2] < 6) {
+                                    return colorlist[3];
+                                } else if (val[2] < 15) {
+                                    return colorlist[4];
+                                } else if (val[2] < 20) {
+                                    return colorlist[5];
+                                } else if (val[2] < 30) {
+                                    return colorlist[6];
+                                } else if (val[2] < 40) {
+                                    return colorlist[7];
+                                } else if (val[2] >= 40 && val[2] < 45) return colorlist[8]
+                                else return colorlist[9];
                             }
                         },
                         data: data,
@@ -591,10 +636,11 @@ export default {
                     }
                 ],
                 grid: {
-                    left: 2,
+                    left: 10,
                     // bottom: 10,
                     right: 20,
-                    containLabel: true
+                    containLabel: true,
+                    height: '90%'
                 },
 
             };
@@ -682,6 +728,52 @@ export default {
             } else {
                 ElMessage.warning("请确认公告")
             }
+        },
+        //历史公告
+        get_history_announcement() {
+            this.$http
+                .get("/get_all_history")
+                .then((res) => {
+                    if (res.status === 200) {
+                        console.log("历史公告:", res.data['history'])
+                        this.all_history = res.data['history']
+                    }
+                })
+                .catch(() => {
+                    console.log("历史公告加载失败")
+                });
+        },
+        //发布公告
+        publishAnnouncement() {
+            this.$http.post("/add_announcement", this.addAnnouncementForm).then((res) => {
+                if (res.status === 200) {
+                    //发布成功
+                    if (res.data.code === 200) {
+                        ElMessage.success(res.data.message)
+                        this.addAnnouncementShowDialog = false
+                    } else {
+                        ElMessage.warning(res.data.message)
+                    }
+                }
+            }).catch(() => {
+                ElMessage.error("发布失败")
+            })
+        },
+        //删除公告
+        delAnnouncement() {
+            this.$http.post("/delete_announcement", this.delAnnouncementForm).then((res) => {
+                if (res.status === 200) {
+                    //删除成功
+                    if (res.data.code === 200) {
+                        ElMessage.success(res.data.message)
+                        this.delAnnouncementShowDialog = false
+                    } else {
+                        ElMessage.warning(res.data.message)
+                    }
+                }
+            }).catch(() => {
+                ElMessage.error("删除失败")
+            })
         }
 
     },

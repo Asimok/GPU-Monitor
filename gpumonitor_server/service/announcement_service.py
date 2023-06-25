@@ -30,6 +30,14 @@ class AnnouncementService:
     def add_push_info(self, ip, announcement_id):
         self.announcement_dao.add_push_info(ip=ip, announcement_id=announcement_id)
 
+    # 得到所有历史公告的数据
+    def get_all_history_announcement(self):
+        res = []
+        _data = self.announcement_dao.get_all_history_announcement()
+        for tmp in _data:
+            res.append(list(tmp))
+        return res[::-1]
+
 
 if __name__ == '__main__':
     announcementService = AnnouncementService(COON)

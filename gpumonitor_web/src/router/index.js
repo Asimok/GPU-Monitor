@@ -10,7 +10,6 @@ const routes = [
                 name: '首页',
                 component: () => import('@/views/gpu_monitor/gpu_monitor'),
             },
-
         ],
     },
 ]

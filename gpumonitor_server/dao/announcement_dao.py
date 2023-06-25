@@ -105,6 +105,13 @@ class AnnouncementDao:
         finally:
             lock.release()
 
+    # 查询所有公告--for 历史公告
+    def get_all_history_announcement(self):
+        _cur_time = datetime.datetime.now()
+        self.c.execute(
+            "SELECT id, date, expire_date, times, announcement FROM announcement_info" )
+        result = self.c.fetchall()
+        return result
 
 if __name__ == '__main__':
     coon = COON

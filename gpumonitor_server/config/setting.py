@@ -22,3 +22,7 @@ BASE_DIR = str(BASE_DIR).replace('config', 'database')
 print("db path: ", BASE_DIR)
 db_path = os.path.join(BASE_DIR, "ip.db")
 COON = sqlite3.connect(db_path, check_same_thread=False)
+"""
+管理员授权码
+"""
+AccessToken = ""

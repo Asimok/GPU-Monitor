@@ -5,7 +5,7 @@ from flask import jsonify
 from flask import request
 from flask_cors import CORS
 
-from config.setting import COON, SERVERS_CONFIG
+from config.setting import COON, SERVERS_CONFIG, AccessToken
 from core.Server import Server
 from service.announcement_service import AnnouncementService
 
@@ -128,11 +128,14 @@ def get_statistics():
 @app.route('/add_announcement', methods=['POST'])
 def add_announcement():
     try:
-        announcement_service.add_announcement(announcement=request.form["announcement"],
-                                              expire_date=int(request.form["expire_date"]),
-                                              available=int(request.form["available"]),
-                                              times=int(request.form["times"]))
-        return jsonify({'code': 200, 'message': '添加成功!'})
+        if request.json['access_token'] == AccessToken:
+            announcement_service.add_announcement(announcement=request.json["announcement"],
+                                                  expire_date=int(request.json["expire_date"]),
+                                                  available=int(request.json["available"]),
+                                                  times=int(request.json["times"]))
+            return jsonify({'code': 200, 'message': '添加成功!'})
+        else:
+            return jsonify({'code': 201, 'message': "认证失败!"})
     except Exception as e:
         return jsonify({'code': 200, 'message': "添加失败!"})
 
@@ -141,8 +144,11 @@ def add_announcement():
 @app.route('/delete_announcement', methods=['POST'])
 def delete_announcement():
     try:
-        announcement_service.del_announcement_by_id(request.form["announcement_id"])
-        return jsonify({'code': 200, 'message': '删除成功!'})
+        if request.json['access_token'] == AccessToken:
+            announcement_service.del_announcement_by_id(request.json["announcement_id"])
+            return jsonify({'code': 200, 'message': '删除成功!'})
+        else:
+            return jsonify({'code': 201, 'message': "认证失败!"})
     except Exception as e:
         return jsonify({'code': 200, 'message': "删除失败!"})
 
@@ -157,6 +163,12 @@ def add_push_info():
     print(request.json)
     announcement_service.add_push_info(ip=request.remote_addr, announcement_id=request.json['announcement_id'])
     return jsonify({'code': 200, 'message': '添加成功!'})
+
+
+@app.route('/get_all_history', methods=['GET'])
+def get_all_history_announcement():
+    res = announcement_service.get_all_history_announcement()
+    return jsonify({'history': res})
 
 
 if __name__ == '__main__':
