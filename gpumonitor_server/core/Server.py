@@ -22,7 +22,7 @@ class Server(threading.Thread):
 
         self.gpu_list: List[GPU] = []
 
-        self.ssh: paramiko.SSHClient = None
+        self.ssh: paramiko.SSHClient = paramiko.SSHClient()  # ssh连接
         # 线程相关
         self.update_time = datetime.datetime.timestamp(datetime.datetime.now())  # 更新时间
         self.paused = False
@@ -39,7 +39,8 @@ class Server(threading.Thread):
             if not self.paused and not self.check():
                 try:
                     self.update_state()
-                except:
+                except Exception as e:
+                    print(str(e))
                     if not self.update_ssh():
                         self.gpu_list = []
             time.sleep(REFRESH_SEC)
@@ -69,10 +70,11 @@ class Server(threading.Thread):
         ssh.set_missing_host_key_policy(key)
         try:
             ssh.connect(self.ip, 22, self.username, self.password)
-        except:
+            self.ssh = ssh
+            return True
+        except Exception as e:
+            print(str(e))
             return False
-        self.ssh = ssh
-        return True
 
     def get_pro_time(self, pid):
         # 进程运行时间
@@ -130,13 +132,16 @@ class Server(threading.Thread):
                         # 获取日志
                         cur_log = self.get_log(pid)
                         log_cmd = self.LOGGER.get_log(pid)
-                except:
-                    pass
-                username, command = process_dict[pid]
-                if use_memory.__contains__("MiB"):
-                    use_memory = int(use_memory[:-3])
-                start_time, duration = self.get_pro_time(pid)
-                gpu.program_list.append(
-                    Program(pid, command, username, use_memory, start_time, duration, cur_log, log_cmd))
+                except Exception as e:
+                    print(str(e))
+                try:
+                    username, command = process_dict[pid]
+                    if use_memory.__contains__("MiB"):
+                        use_memory = int(use_memory[:-3])
+                    start_time, duration = self.get_pro_time(pid)
+                    gpu.program_list.append(
+                        Program(pid, command, username, use_memory, start_time, duration, cur_log, log_cmd))
+                except Exception as e:
+                    print(str(e))
 
         self.gpu_list = gpu_list

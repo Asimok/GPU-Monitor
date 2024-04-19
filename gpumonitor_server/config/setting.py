@@ -13,16 +13,20 @@ UPDATE_GAP = 20
 # 配置需要监控的服务器
 SERVERS_CONFIG = [
     # ('Server name', 'ip', 'user', 'password'),
+    # ('Server18 (A40 48G x2)', 'ip', 'username', 'your password'),
 ]
+
 """
 数据库配置
 """
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = str(BASE_DIR).replace('config', 'database')
+os.makedirs(BASE_DIR, exist_ok=True)
 print("db path: ", BASE_DIR)
 db_path = os.path.join(BASE_DIR, "ip.db")
 COON = sqlite3.connect(db_path, check_same_thread=False)
+
 """
 管理员授权码
 """
-AccessToken = ""
+AccessToken = "your password"

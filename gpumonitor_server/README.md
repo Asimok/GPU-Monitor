@@ -20,8 +20,8 @@
 
 ### 本地打包推送
 
-```sh
-docker build . -t 219.216.65.59:5000/gpumonitor_server:latest
+```shell
+docker build --platform linux/amd64 . -t 219.216.65.59:5000/gpumonitor_server:latest
 docker push 219.216.65.59:5000/gpumonitor_server:latest
 ```
 

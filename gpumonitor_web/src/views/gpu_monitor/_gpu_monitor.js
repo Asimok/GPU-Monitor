@@ -5,7 +5,7 @@ import * as echarts from "echarts";
 import {
     ArrowRight,
     CaretBottom,
-    CaretTop, ChatLineRound, Male,
+    CaretTop, ChatLineRound, Edit, Male,
     Warning,
 } from '@element-plus/icons'
 import {Apple} from "@element-plus/icons-vue";
@@ -94,8 +94,26 @@ export default {
                 announcement_id: '',
                 access_token: '',
             },
+            // 管理员授权
+            autoMonitorShowDialog: false,
+            autoMonitorKey: '',
             //系统更新日志
             update_log_data: [
+                {
+                    "timestamp": "2024-4-19",
+                    "title": "v4.6.4 Final Version ",
+                    "info": ["版本迭代终止，感兴趣的同学在我开源代码的基础上继续创作~"]
+                },
+                {
+                    "timestamp": "2023-12-22",
+                    "title": "v4.6.3",
+                    "info": ["新增显卡预约系统", "优化UI"]
+                },
+                {
+                    "timestamp": "2023-09-22",
+                    "title": "v4.6.2",
+                    "info": ["新增管理员授权模式"]
+                },
                 {
                     "timestamp": "2023-06-25",
                     "title": "v4.6.1",
@@ -171,7 +189,11 @@ export default {
         }
     },
 
-    computed: {},
+    computed: {
+        Edit() {
+            return Edit
+        }
+    },
 
     watch: {},
 
@@ -601,32 +623,33 @@ export default {
                         symbolSize: function (val) {
                             if (val[2] < 45) {
                                 return parseInt(val[2]) * 1.5 + 5;
-                            } else return parseInt(val[4]) * 1.5 + 10;
+                                // } else return parseInt(val[4]) * 1.5 + 10;
+                            } else return 77;
                         },
                         // 定义颜色
                         itemStyle: {
                             color: function (params) {
                                 const val = params.data
                                 // console.log("val:", val.data)
-                                const colorlist = ['#438EAB', '#6B7478', '#E2ACA7', '#DE8395', '#DED762', '#DE7657', '#57DEBA', '#A283DE', '#62DE76', '#AB4358'];
+                                const colorList = ['#438EAB', '#6B7478', '#E2ACA7', '#DE8395', '#DED762', '#DE7657', '#57DEBA', '#A283DE', '#62DE76', '#AB4358'];
                                 if (val[2] < 2) {
-                                    return colorlist[0];
+                                    return colorList[0];
                                 } else if (val[2] < 3) {
-                                    return colorlist[1];
+                                    return colorList[1];
                                 } else if (val[2] < 4) {
-                                    return colorlist[2];
+                                    return colorList[2];
                                 } else if (val[2] < 6) {
-                                    return colorlist[3];
+                                    return colorList[3];
                                 } else if (val[2] < 15) {
-                                    return colorlist[4];
+                                    return colorList[4];
                                 } else if (val[2] < 20) {
-                                    return colorlist[5];
+                                    return colorList[5];
                                 } else if (val[2] < 30) {
-                                    return colorlist[6];
+                                    return colorList[6];
                                 } else if (val[2] < 40) {
-                                    return colorlist[7];
-                                } else if (val[2] >= 40 && val[2] < 45) return colorlist[8]
-                                else return colorlist[9];
+                                    return colorList[7];
+                                } else if (val[2] >= 40 && val[2] < 45) return colorList[8]
+                                else return colorList[9];
                             }
                         },
                         data: data,
@@ -774,6 +797,24 @@ export default {
             }).catch(() => {
                 ElMessage.error("删除失败")
             })
+        },
+        //管理员授权
+        autoMonitor() {
+            if (this.autoMonitorKey === 'your_key') {
+                this.sysInfoTimeout = 99999999 // 当前挂起倒计时时间
+                this.sysInfoTimeoutLimit = 99999999// 挂起倒计时上限
+                this.sysCurrentTimeout = 99999999 // 当前系统计时器时间
+                ElMessage.success("授权成功")
+                this.autoMonitorShowDialog = false
+                this.closeSuspendDialog()
+            } else
+                ElMessage.error("授权码错误，请确保你有权限！")
+        },
+        //NEUKG服务器显卡预约表
+        GPU_Appointment() {
+            // 跳转至url
+            const url = 'https://docs.qq.com/xx';
+            window.open(url, "_blank");
         }
 
     },

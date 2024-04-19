@@ -81,7 +81,7 @@ def delete_log():
 
 
 @app.route('/runMC', methods=['GET'])
-def runMC():
+def run_mc():
     # run_mc_server('219.216.64.204', 'mc', 'mc')
     host = '219.216.64.204'
     user = 'mc'
@@ -97,7 +97,7 @@ def runMC():
 
 # 彩蛋
 @app.route('/stopMC', methods=['GET'])
-def stopMC():
+def stop_mc():
     host = '219.216.64.204'
     user = 'mc'
     passwd = 'mc'
@@ -137,6 +137,7 @@ def add_announcement():
         else:
             return jsonify({'code': 201, 'message': "认证失败!"})
     except Exception as e:
+        print(str(e))
         return jsonify({'code': 200, 'message': "添加失败!"})
 
 
@@ -150,6 +151,7 @@ def delete_announcement():
         else:
             return jsonify({'code': 201, 'message': "认证失败!"})
     except Exception as e:
+        print(str(e))
         return jsonify({'code': 200, 'message': "删除失败!"})
 
 

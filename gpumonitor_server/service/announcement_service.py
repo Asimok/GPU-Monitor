@@ -1,6 +1,3 @@
-import collections
-import datetime
-
 from config.setting import COON
 from dao.announcement_dao import AnnouncementDao
 

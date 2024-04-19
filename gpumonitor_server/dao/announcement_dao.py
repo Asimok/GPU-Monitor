@@ -109,14 +109,15 @@ class AnnouncementDao:
     def get_all_history_announcement(self):
         _cur_time = datetime.datetime.now()
         self.c.execute(
-            "SELECT id, date, expire_date, times, announcement FROM announcement_info" )
+            "SELECT id, date, expire_date, times, announcement FROM announcement_info")
         result = self.c.fetchall()
         return result
 
+
 if __name__ == '__main__':
-    coon = COON
-    announcement_dao = AnnouncementDao(coon)
-    cur_time = datetime.datetime.now()
+    # coon = COON
+    # announcement_dao = AnnouncementDao(coon)
+    # cur_time = datetime.datetime.now()
     # announcement_dao.add_announcement(announcement="第二条测试", expire_date=3, available=1, times=5)
     # data = announcement_dao.get_all_announcement()
     # data = announcement_dao.get_announcement_by_ip(ip="12.121.121.12", announcement_id=3)
