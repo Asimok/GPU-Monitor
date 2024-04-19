@@ -1,25 +1,25 @@
 <div align="center">
 <h1>GPU-Monitor</h1>
-<p><em>Real-time monitoring of model training status, GPU resource utilization, model training logs, IP access records, etc.</em></p>
-<p>Welcome to star, fork, and submit pull requests.</p>
+<p><em>实时查看模型训练状态、GPU资源占用、模型训练日志、IP访问记录等</em></p>
+<p>欢迎各位 star fork pr </p>
 </div>
 
-## Main Features
+## 主要特色
 
-- [x] Lightweight and Concise: Flask + SQLite3 + Vue3 + ElementUI-Plus
-- [x] Quick Integration: Integration with new servers is as easy as a single line of configuration
-- [x] Leisurely Alchemy: Real-time monitoring of model training progress
-- [x] Logging System: Track changes in model loss and review training logs
-- [x] Announcement Module: Timely delivery of important information
-- [x] IP Statistics: Collect and display IP access information to enhance security awareness
-- [x] Quick Card Grabbing: Real-time preview of GPU resource utilization
-- [x] Low Resource Consumption: Multi-threaded controllable scheduling with minimal CPU usage
-- [x] One-Click Deployment: Docker one-click deployment
-- [x] Extensibility: Suitable for beginners to practice
+- [x] 轻量简洁：Flask+Sqlite3+Vue3+ElementUI-Plus
+- [x] 快速接入：只需一行配置即可接入新的服务器
+- [x] 休闲炼丹：实时掌握模型训练进度
+- [x] 日志系统：跟踪模型loss变化，查看训练日志
+- [x] 公告模块：及时推送重要信息
+- [x] IP统计：统计并展示IP访问情况，提高安全意识
+- [x] 快速抢卡：实时预览GPU资源占用
+- [x] 低资源消耗：多线程可控调度，CPU占用极低
+- [x] 一键部署：docker一键部署
+- [x] 自由拓展：适合新手练手项目
 
-## Preview
+## 预览
 
-### Home Page
+### 首页
 
 <table style="width: 100%">
 <tr style="width: 100%;">
@@ -29,7 +29,7 @@
 </tr>
 </table>
 
-### Announcement Module
+### 公告模块
 
 <table style="width: 100%">
 <tr style="width: 100%;">
@@ -39,7 +39,7 @@
 </tr>
 </table>
 
-### GPU Server Details
+### GPU服务器详情
 <table style="width: 100%">
 <tr style="width: 100%;">
 <td colspan="2" style="width: 100%;">
@@ -49,7 +49,7 @@
 </table>
 
 
-### Logging System
+### 日志系统
 
 <table style="width: 100%">
 <tr style="width: 100%;">
@@ -59,7 +59,7 @@
 </tr>
 </table>
 
-### Logging System
+### 日志系统
 
 <table style="width: 100%">
 <tr style="width: 100%;">
@@ -69,7 +69,7 @@
 </tr>
 </table>
 
-### Log Management
+### 日志管理
 <table style="width: 100%">
 <tr style="width: 100%;">
 <td colspan="2" style="width: 100%;">
@@ -78,7 +78,7 @@
 </tr>
 </table>
 
-### View Logs
+### 查看日志
 
 <table style="width: 100%">
 <tr style="width: 100%;">
@@ -88,7 +88,7 @@
 </tr>
 </table>
 
-### System Monitoring
+### 系统监测
 
 <table style="width: 100%">
 <tr style="width: 100%;">
@@ -98,7 +98,7 @@
 </tr>
 </table>
 
-### Performance Oversight
+### 性能监管
 
 <table style="width: 100%">
 <tr style="width: 100%;">
@@ -109,7 +109,7 @@
 </table>
 
 
-### Update Log or Change Log
+### 更新日志
 
 <table style="width: 100%">
 <tr style="width: 100%;">
@@ -119,32 +119,31 @@
 </tr>
 </table>
 
+## 部署方式
 
-## Deployment Methods
+### Docker部署示例
 
-### Docker Deployment Example
-
-#### 1. Build the Image
+#### 1. 构建镜像
 
 ```sh
 docker-compose build
 ```
 
-#### 2. Run the Service
+#### 2. 运行服务
 
 ```sh
 docker-compose up -d
 ```
 
-#### 3. Rebuild
+#### 3. 重新构建
 
 ```sh
 docker stop gpumonitor_web & docker rm -f gpumonitor_web & docker rmi -f  219.216.65.59:5000/gpumonitor_web:latest & \
 docker stop gpumonitor_server & docker rm -f gpumonitor_server & docker rmi -f  219.216.65.59:5000/gpumonitor_server:latest & \
 ```
 
-# Appreciation
->If it can help you
+## 赞赏
+> 如果能够帮助到你
 <table style="width: 100%">
 <tr style="width: 100%">
 <td style="width: 30%;text-align: center;">
@@ -158,7 +157,6 @@ docker stop gpumonitor_server & docker rm -f gpumonitor_server & docker rmi -f  
 </tr>
 </table>    
 
+## 免责声明
 
-## Disclaimer
-
-This project is open-sourced solely for educational purposes and shall not be used for any illegal activities. Otherwise, the consequences are your own responsibility and are not associated with me. Please retain the project's address when using it, thank you.
+本项目开源仅供学习使用，不得用于任何违法用途，否则后果自负，与本人无关。使用请保留项目地址谢谢。

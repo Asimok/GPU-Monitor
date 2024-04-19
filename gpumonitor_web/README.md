@@ -3,7 +3,7 @@
 ```shell
 .
 ├── Dockerfile
-├── README.md
+├── README-zh.md
 ├── build.sh
 ├── dist
 ├── nginx # nginx配置

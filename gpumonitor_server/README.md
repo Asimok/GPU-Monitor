@@ -2,7 +2,7 @@
 ```shell
 .
 ├── Dockerfile
-├── README.md
+├── README-zh.md
 ├── config # 系统配置
 ├── core # 核心代码
 ├── dao # 数据库操作
